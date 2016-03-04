@@ -1,0 +1,18 @@
+﻿  Source.cpp
+d:\visual\project\game\game\personage.h(30): warning C4244: =: преобразование "double" в "int", возможна потеря данных
+d:\visual\project\game\game\personage.h(47): warning C4244: +=: преобразование "double" в "float", возможна потеря данных
+d:\visual\project\game\game\personage.h(50): warning C4244: -=: преобразование "double" в "float", возможна потеря данных
+d:\visual\project\game\game\personage.h(57): warning C4244: +=: преобразование "double" в "float", возможна потеря данных
+d:\visual\project\game\game\personage.h(60): warning C4244: +=: преобразование "double" в "float", возможна потеря данных
+d:\visual\project\game\game\personage.h(67): warning C4244: +=: преобразование "double" в "float", возможна потеря данных
+d:\visual\project\game\game\personage.h(70): warning C4244: -=: преобразование "double" в "float", возможна потеря данных
+d:\visual\project\game\game\personage.h(77): warning C4244: +=: преобразование "double" в "float", возможна потеря данных
+d:\visual\project\game\game\personage.h(80): warning C4244: +=: преобразование "double" в "float", возможна потеря данных
+d:\visual\project\game\game\personage.h(90): warning C4244: инициализация: преобразование "float" в "int", возможна потеря данных
+d:\visual\project\game\game\personage.h(91): warning C4244: инициализация: преобразование "float" в "int", возможна потеря данных
+d:\visual\project\game\game\personage.h(132): warning C4244: инициализация: преобразование "float" в "int", возможна потеря данных
+d:\visual\project\game\game\personage.h(133): warning C4244: инициализация: преобразование "float" в "int", возможна потеря данных
+d:\visual\project\game\game\source.cpp(116): warning C4244: =: преобразование "sf::Int64" в "float", возможна потеря данных
+d:\visual\project\game\game\source.cpp(149): warning C4244: аргумент: преобразование "int" в "float", возможна потеря данных
+  Game.vcxproj -> D:\Visual\Project\Game\Debug\Game.exe
+  Game.vcxproj -> D:\Visual\Project\Game\Debug\Game.pdb (Partial PDB)
