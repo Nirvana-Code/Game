@@ -21,11 +21,11 @@ float CurentFrame = 0;
 float timer;
 int HeroDirect = 0;
 bool isMenu = true;
-int gameDir = 0;
+
 
 void Menu(RenderWindow &window);
 void Game(RenderWindow &window);
-void Next_lvl();
+void levelComplete(RenderWindow &window);
 
 int main()
 {
@@ -38,6 +38,8 @@ int main()
 
 void Menu(RenderWindow & window)
 {
+	int dirMenu = 0;
+
 	Texture menu1;
 	Texture menu2;
 	Texture fon;
@@ -60,28 +62,34 @@ void Menu(RenderWindow & window)
 		menu2_spr.setColor(Color::White);
 		
 
-		if (IntRect(224, 32, 192, 64).contains(Mouse::getPosition(window)))
+		if (IntRect(224, 32, 192, 64).contains(Mouse::getPosition(window))) dirMenu = 1;
+		else if (IntRect(224, 96, 192, 64).contains(Mouse::getPosition(window))) dirMenu = 2;
+
+		if (Keyboard::isKeyPressed(Keyboard::Down))
 		{
-			menu1_spr.setColor(Color::Red);
-			gameDir = 1;
+			if (dirMenu < 2) dirMenu++;
 		}
-		else if (IntRect(224, 96, 192, 64).contains(Mouse::getPosition(window)))
+		else if (Keyboard::isKeyPressed(Keyboard::Up))
 		{
-			menu2_spr.setColor(Color::Red);
-			gameDir = 2;
+			if (dirMenu > 1) dirMenu--;
 		}
 
-		if (Mouse::isButtonPressed(Mouse::Left))
+		if (dirMenu == 1) menu1_spr.setColor(Color::Red);
+		else if (dirMenu == 2) menu2_spr.setColor(Color::Red);
+
+		if (Mouse::isButtonPressed(Mouse::Left) || Keyboard::isKeyPressed(Keyboard::Space))
 		{
-			if (gameDir == 1) isMenu = false;
-			else if (gameDir == 2) 
+			if (dirMenu == 1)
+			{
+				isMenu = false;
+				Player.inGame = true;
+			}
+			else if (dirMenu == 2) 
 			{
 				isMenu = false;
 				window.close();
 			}
 		}
-
-		if (Keyboard::isKeyPressed(Keyboard::Space)) break;
 
 		window.draw(fon_spr);
 		window.draw(menu1_spr);
@@ -109,9 +117,9 @@ void Game(RenderWindow & window)
 	score.setPosition(5, 0);
 	score.setColor(Color::White);
 
-	Player.sprite.setPosition(Player.rect.left, Player.rect.top + 32);
+	Player.sprite.setPosition(Player.rect.left - 16, Player.rect.top + 16);
 
-	while (window.isOpen()) {
+	while (Player.inGame) {
 
 		timer = timers.getElapsedTime().asMicroseconds();
 		timers.restart();
@@ -119,7 +127,6 @@ void Game(RenderWindow & window)
 
 		Event event;
 		while (window.pollEvent(event)) {
-
 			if (event.type == sf::Event::Closed)
 				window.close();
 		}
@@ -128,77 +135,106 @@ void Game(RenderWindow & window)
 		else if (Keyboard::isKeyPressed(Keyboard::Right)) Player.Update(timer, 2);
 		else if (Keyboard::isKeyPressed(Keyboard::Up)) Player.Update(timer, 3);
 		else if (Keyboard::isKeyPressed(Keyboard::Down)) Player.Update(timer, 4);
+		else if (Keyboard::isKeyPressed(Keyboard::B)) Player.createBomb();
+		else if (Keyboard::isKeyPressed(Keyboard::V)) Player.delBomb();
 		else if (Keyboard::isKeyPressed(Keyboard::Escape)) break;
 
 		window.clear();
 
-		if (Player.GameStart)
+		//Функция для отрисовки карты
+		for (int i(0); i < MAP_WIDTH; i++)
 		{
-			//Функция для отрисовки карты
-			for (int i(0); i < MAP_WIDTH; i++)
+			for (int j(0); j < MAP_HEIGHT; j++)
 			{
-				for (int j(0); j < MAP_HEIGHT; j++)
-				{
-					if (Map[i][j] == '*') s_map.setTextureRect(IntRect(0, 0, 32, 32));
-					else if (Map[i][j] == '+') s_map.setTextureRect(IntRect(32, 0, 32, 32));
-					else if (Map[i][j] == '_') s_map.setTextureRect(IntRect(64, 0, 32, 32));
-					else if (Map[i][j] == 'S') s_map.setTextureRect(IntRect(96, 0, 32, 32));
-					else if (Map[i][j] == 'F') s_map.setTextureRect(IntRect(128, 0, 32, 32));
-					else if (Map[i][j] == 'b') s_map.setTextureRect(IntRect(160, 0, 32, 32));
-					else if (Map[i][j] == 'B') s_map.setTextureRect(IntRect(192, 0, 32, 32));
-					s_map.setPosition(j * 32, (i * 32) + 32);
+				if (Map[i][j] == '*') s_map.setTextureRect(IntRect(0, 0, 32, 32));
+				else if (Map[i][j] == '+') s_map.setTextureRect(IntRect(32, 0, 32, 32));
+				else if (Map[i][j] == '_') s_map.setTextureRect(IntRect(64, 0, 32, 32));
+				else if (Map[i][j] == 'S') s_map.setTextureRect(IntRect(96, 0, 32, 32));
+				else if (Map[i][j] == 'F') s_map.setTextureRect(IntRect(128, 0, 32, 32));
+				else if (Map[i][j] == 'b') s_map.setTextureRect(IntRect(160, 0, 32, 32));
+				else if (Map[i][j] == 'B') s_map.setTextureRect(IntRect(192, 0, 32, 32));
+				else if (Map[i][j] == 'V') s_map.setTextureRect(IntRect(224, 0, 32, 32));
+				s_map.setPosition(j * 32, (i * 32) + 32);
 
-					window.draw(s_map);
-				}
+				window.draw(s_map);
 			}
-			ostringstream Score;
-			Score << Player.UserScore << "  Level: " << Player.level;
-			score.setString(L"Очки: " + Score.str());
-			window.draw(score);
-
-			window.draw(Player.sprite);
 		}
-		else //По окнчанию уровня
-		{
-			window.draw(fon_spr);
-			font.loadFromFile("font.otf");
-			Text score("", font, 40);
-			ostringstream Score;
-			score.setPosition(100, 60);
-			score.setColor(Color::White);
-			Score << Player.UserScore;
-			score.setString(L"Уровен пройден! Ваши очки: " + Score.str());
-			window.draw(score);
-			Texture next;
-			next.loadFromFile("next-lvl.png");
-			Sprite nextlvl;
-			nextlvl.setTexture(next);
-			nextlvl.setPosition(176, 150);
-			nextlvl.setColor(Color::White);
-			int dir_up = 0;
-			if (IntRect(176, 150, 288, 40).contains(Mouse::getPosition(window)))
-			{
-				dir_up = 1;
-				nextlvl.setColor(Color::Red);
-			}
+		ostringstream Score;
+		Score << Player.UserScore << "  Level: " << Player.level << "   Bomb: " << Player.UserBomb;
+		score.setString(L"Очки: " + Score.str());
+		window.draw(score);
+		window.draw(Player.sprite);
+		window.display();
+	}
+	levelComplete(window);
+	Player.inGame = false;
+}
 
-			if (Mouse::isButtonPressed(Mouse::Left))
+void levelComplete(RenderWindow &window)
+{
+	//Нужные переменные
+	int dirMenu = 0;
+	bool tap = false;
+
+	Texture menu1;
+	Texture menu2;
+	Texture fon;
+
+	menu1.loadFromFile("next-lvl.png");
+	menu2.loadFromFile("exit.png");
+	fon.loadFromFile("fon.jpg");
+	Sprite menu1_spr(menu1);
+	Sprite menu2_spr(menu2);
+	Sprite fon_spr(fon);
+	menu1_spr.setPosition(176, 32);
+	menu2_spr.setPosition(224, 96);
+	fon_spr.setPosition(0, 0);
+
+	while (!Player.inGame)
+	{
+		menu1_spr.setColor(Color::White);
+		menu2_spr.setColor(Color::White);
+
+		if (MAx_LVL > Player.level)
+		{
+			if (IntRect(176, 32, 288, 40).contains(Mouse::getPosition(window))) dirMenu = 1;
+			else if (IntRect(224, 96, 192, 64).contains(Mouse::getPosition(window))) dirMenu = 2;
+		}
+		else if (IntRect(224, 96, 192, 64).contains(Mouse::getPosition(window))) dirMenu = 2;
+		
+		if (Keyboard::isKeyPressed(Keyboard::Down)) 
+		{
+			if(dirMenu < 2) dirMenu++;
+		}
+		else if (Keyboard::isKeyPressed(Keyboard::Up))
+		{
+			if (dirMenu > 1) dirMenu--;
+		}
+
+		if (dirMenu == 1) menu1_spr.setColor(Color::Red);
+		else if (dirMenu == 2) menu2_spr.setColor(Color::Red);
+
+		if (Keyboard::isKeyPressed(Keyboard::Space) || Mouse::isButtonPressed(Mouse::Left))
+		{
+			if (dirMenu == 1)
 			{
-				Next_lvl();
+				Player.inGame = true;
+				Levels(Player.level++);
 				Game(window);
 			}
-			window.draw(nextlvl);
+			else if (dirMenu == 2)
+			{
+				Player.inGame = true;
+				window.close();
+			}
 		}
+
+		window.clear();
+
+		window.draw(fon_spr);
+		if(MAx_LVL > Player.level) window.draw(menu1_spr);
+		window.draw(menu2_spr);
 
 		window.display();
 	}
-}
-
-void Next_lvl()
-{
-	Player.level++;
-	Player.GameStart = true;
-	Player.rect.top = 32;
-	Player.rect.left = 32;
-	Player.UserScore = 0;
 }

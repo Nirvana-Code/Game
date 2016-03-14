@@ -131,6 +131,9 @@
     <ClInclude Include="Maps.h" />
     <ClInclude Include="Personage.h" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="level1.lvl" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

@@ -1,0 +1,18 @@
+﻿  Source.cpp
+t:\game\game\Personage.h(47): warning C4244: +=: преобразование "double" в "float", возможна потеря данных
+t:\game\game\Personage.h(50): warning C4244: -=: преобразование "double" в "float", возможна потеря данных
+t:\game\game\Personage.h(57): warning C4244: +=: преобразование "double" в "float", возможна потеря данных
+t:\game\game\Personage.h(60): warning C4244: +=: преобразование "double" в "float", возможна потеря данных
+t:\game\game\Personage.h(67): warning C4244: +=: преобразование "double" в "float", возможна потеря данных
+t:\game\game\Personage.h(70): warning C4244: -=: преобразование "double" в "float", возможна потеря данных
+t:\game\game\Personage.h(77): warning C4244: +=: преобразование "double" в "float", возможна потеря данных
+t:\game\game\Personage.h(80): warning C4244: +=: преобразование "double" в "float", возможна потеря данных
+t:\game\game\Personage.h(140): warning C4244: инициализация: преобразование "float" в "int", возможна потеря данных
+t:\game\game\Personage.h(141): warning C4244: инициализация: преобразование "float" в "int", возможна потеря данных
+Source.cpp(124): warning C4244: =: преобразование "sf::Int64" в "float", возможна потеря данных
+Source.cpp(157): warning C4244: аргумент: преобразование "int" в "float", возможна потеря данных
+  Создание кода
+  All 208 functions were compiled because no usable IPDB/IOBJ from previous compilation was found.
+  Создание кода завершено
+  Game.vcxproj -> T:\Game\Release\Game.exe
+  Game.vcxproj -> T:\Game\Release\Game.pdb (Full PDB)

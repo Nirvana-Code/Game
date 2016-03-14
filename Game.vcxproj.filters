@@ -27,4 +27,9 @@
       <Filter>Файлы исходного кода</Filter>
     </ClInclude>
   </ItemGroup>
+  <ItemGroup>
+    <None Include="level1.lvl">
+      <Filter>Файлы ресурсов</Filter>
+    </None>
+  </ItemGroup>
 </Project>

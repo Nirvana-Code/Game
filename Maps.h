@@ -9,6 +9,7 @@ using namespace std;
 
 const int MAP_HEIGHT = 20; //высота карты
 const int MAP_WIDTH = 20; //Ширина карты
+const int MAx_LVL = 2; //Максимальный уровень в игре
 
 String Map[MAP_HEIGHT]
 {

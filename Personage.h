@@ -11,6 +11,13 @@ using namespace sf;
 class Personage
 {
 public:
+	struct bomb
+	{
+		int x;
+		int y;
+	};
+
+	bomb masBomb[400];
 	int dx, dy;
 	int UserScore;
 	Sprite sprite;
@@ -19,22 +26,26 @@ public:
 	float upFrame;
 	float downFrame;
 	int level;
+	int bombCount;
 	FloatRect rect;
-	bool GameStart = false;
+	int UserBomb;
+	bool inGame = false; //Индикатор начала игры
 
 	Personage(Texture &texture)
 	{
 		sprite.setTexture(texture);
 		sprite.setTextureRect(IntRect(32,0,32,32));
-		rect = FloatRect(32, 32, 32, 32);
-		dx = dy = 0.1;
+
+		rect = FloatRect(48, 48, 12, 12);
 		leftFrame = 0;
 		rightFrame = 0;
 		upFrame = 0;
 		downFrame = 0;
 		UserScore = 0;
-		GameStart = true;
+		inGame = true;
 		level = 1;
+		bombCount = 0;
+		UserBomb = 2;
 	}
 
 	void Update(float time, int dir) //Функция для перемещения персонажа
@@ -81,46 +92,54 @@ public:
 		}
 		Collision(dir);
 		border(dir);
-		sprite.setPosition(rect.left, rect.top +32);
+		sprite.setPosition(rect.left - 16, rect.top + 16);
 	}
 	
 	void Collision(int dir) //Функция обработки столкновения
 	{
+		if (dir == 1)
+		{
+			int x = int((rect.left - rect.width - 8)/32);
+			int wy = int((rect.top + rect.height)/32);
+			int ny = int((rect.top - rect.height)/32);
+			if(Map[wy][x] == '+' || Map[ny][x] == '+' || Map[wy][x] == '*' || Map[ny][x] == '*')
+				rect.left = (x+1) * 32 + rect.width;
+		}
+		else if (dir == 2)
+		{
+			int x = int((rect.left + rect.width) / 32);
+			int wy = int((rect.top - rect.height) / 32);
+			int ny = int((rect.top + rect.height) / 32);
+			if (Map[wy][x] == '+' || Map[ny][x] == '+' || Map[wy][x] == '*' || Map[ny][x] == '*')
+				rect.left = x  * 32 - rect.width;
+		}
+		else if (dir == 3)
+		{
+			int y = int((rect.top - rect.height) / 32);
+			int lx = int((rect.left - rect.width) / 32);
+			int rx = int((rect.left + rect.width) / 32);
+			if (Map[y][lx] == '+' || Map[y][rx] == '+' || Map[y][lx] == '*' || Map[y][rx] == '*')
+				rect.top = (y + 1) * 32 + rect.height;
+		}
+		else if (dir == 4)
+		{
+			int y = int((rect.top + rect.height + 8) / 32);
+			int lx = int((rect.left - rect.width) / 32);
+			int rx = int((rect.left + rect.width) / 32);
+			if (Map[y][lx] == '+' || Map[y][rx] == '+' || Map[y][lx] == '*' || Map[y][rx] == '*')
+				rect.top = (y - 1) * 32 + rect.height;
+		}
 
-		for (int i = (rect.top) / 32; i < ((rect.top + rect.height) / 32); i++)
-			for (int j = rect.left / 32; j < ((rect.left + rect.width) / 32); j++)
-			{
-				if (Map[i][j] == '*') //Столкновение с стенкой
-				{
-					if (dir == 1) rect.left = j * 32 + rect.width;
-					if (dir == 2) rect.left = j * 32 - rect.width;
-					if (dir == 3) rect.top = i * 32 + rect.height;
-					if (dir == 4) rect.top = i * 32 - rect.height;
-				}
-				else if (Map[i][j] == '+') //Столкновение с блоком
-				{
-					if (dir == 1) rect.left = j * 32 + rect.width;
-					if (dir == 2) rect.left = j * 32 - rect.width;
-					if (dir == 3) rect.top = i * 32 + rect.height;
-					if (dir == 4) rect.top = i * 32 - rect.height;
-				}
-				else if (Map[i][j] == 'S')
-				{
-					Map[i][j] = '_';
-					UserScore++;
-				}
-				else if (Map[i][j] == 'F')
-				{
-					GameStart = false;
-				}
-				else if (Map[i][j] == 'B') //Столкновение с блоком
-				{
-					if (dir == 1) rect.left = j * 32 + rect.width;
-					if (dir == 2) rect.left = j * 32 - rect.width;
-					if (dir == 3) rect.top = i * 32 + rect.height;
-					if (dir == 4) rect.top = i * 32 - rect.height;
-				}
-			}
+		if (Map[int(rect.top / 32)][int(rect.left / 32)] == 'S')
+		{
+			Map[int(rect.top / 32)][int(rect.left / 32)] = '_';
+			UserScore++;
+		} else if (Map[int(rect.top / 32)][int(rect.left / 32)] == 'F')
+		{
+			inGame = false;
+		}
+
+		cout << rect.top << ' ' << rect.left << '\n';
 	}
 
 	void border(int dir)
@@ -137,7 +156,53 @@ public:
 		}
 	}
 
-	void Stats() {
-
+	void createBomb() //Функция будет создавать бомбу на поле
+	{
+		int x = int(rect.left / 32);
+		int y = int(rect.top / 32);
+		if (Map[y][x] == 'V')
+		{
+			UserBomb++;
+			Map[y][x] = '_';
+			masBomb[bombCount].x = 0;
+			masBomb[bombCount].y = 0;
+		}
+		else
+		{
+			if (UserBomb > 0)
+			{
+				Map[y][x] = 'V';
+				masBomb[bombCount].x = x;
+				masBomb[bombCount].y = y;
+				bombCount++;
+			}
+			UserBomb--;
+		}
+	}
+	void delBomb() //Взврыв всех бомб на поле
+	{
+		if (bombCount)
+		{
+			for (int i(0); i < bombCount; i++)
+			{
+				int x = masBomb[i].x;
+				int y = masBomb[i].y;
+				if (x != 0 && y != 0)
+				{
+					if (Map[y - 1][x] == '+') Map[y - 1][x] = '_';
+					if (Map[y - 1][x - 1] == '+') Map[y - 1][x - 1] = '_';
+					if (Map[y + 1][x] == '+') Map[y + 1][x] = '_';
+					if (Map[y + 1][x + 1] == '+') Map[y + 1][x + 1] = '_';
+					if (Map[y - 1][x + 1] == '+') Map[y - 1][x + 1] = '_';
+					if (Map[y + 1][x - 1] == '+') Map[y + 1][x - 1] = '_';
+					if (Map[y][x - 1] == '+') Map[y][x - 1] = '_';
+					if (Map[y][x + 1] == '+') Map[y][x + 1] = '_';
+					Map[y][x] = '_';
+					masBomb[i].x = 0;
+					masBomb[i].y = 0;
+				}
+			}
+			bombCount = 0;
+		}
 	}
 };
